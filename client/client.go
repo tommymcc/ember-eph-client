@@ -244,6 +244,36 @@ func (e *EmberClient) DeactivateBoostForZone(zoneId int) (error) {
 	return nil
 }
 
+func (e * EmberClient) SetTargetTemperatureForZone(zoneId int, temperature int) {
+	setTempUrl := apiBaseUrl + "zones/setTargetTemperature";
+
+	requestBody, _ := json.Marshal(map[string]int{
+		"zoneid": zoneId,
+		"temperature": temperature,
+	})
+
+	req, err := http.NewRequest("POST", setTempUrl, bytes.NewBuffer(requestBody))
+
+	if err != nil {
+		log.Fatal("Error fetching home. ", err)
+	}
+
+	e.setRequestHeaders(req)
+
+	resp, err := e.httpClient.Do(req)
+	if err != nil {
+		log.Fatal("Error reading response. ", err)
+	}
+	defer resp.Body.Close()
+ 
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Fatal("Error reading body. ", err)
+	}
+ 
+	fmt.Printf("%s\n", body)
+}
+
 func (e *EmberClient) ZoneByName(name string) (Zone) {
 	for _, zone := range e.Zones {
 		if zone.Name == name {
