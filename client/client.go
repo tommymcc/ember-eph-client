@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"time"
 	"log"
+	"strings"
 )
 
 // Original Python API at:
@@ -136,12 +137,36 @@ type Zone struct {
 	TargetTemperature float64 `json:"targettemperature"`
 	IsHotWater bool `json:"ishotwater"`
 	IsBoostActive bool `json:"isboostactive"`
+	IsAdvanceActive bool `json:"isadvanceactive"`
 	Status int `json:"status"` // 1 seems to be off, 2 is on
+	Prefix string `json:"prefix"`
 }
 
+// """
+// Taken verbatim from // https://github.com/ttroy50/pyephember
+// Check if the zone is on.
+// This is a bit of a hack as the new API doesn't have a currently
+// active variable
+// """
 func (z *Zone) IsOn() (bool){
-	return z.Status == 2;
+
+	if z.Prefix != "" {
+		if strings.Contains(z.Prefix, " off ") {
+			return false
+		}
+
+		if strings.Contains(z.Prefix, "active ") {
+			return true
+		}
+
+		if strings.Contains(z.Prefix, "ON mode") {
+			return true
+		}
+	}
+
+	return z.IsBoostActive || z.IsAdvanceActive
 }
+
 
 func (e *EmberClient) GetZones(gatewayId string) ([]Zone, error) {
 	getHomeUrl := apiBaseUrl + "zones/polling";

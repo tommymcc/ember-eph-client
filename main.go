@@ -37,5 +37,7 @@ func main() {
 	// client.BoostZone(heating.ZoneId, 1, 27)
 	// client.BoostZone(hotWater.ZoneId, 1, 60)
 
+	// client.SetTargetTemperatureForZone(hotWater.ZoneId,60)
+
 	// client.DeactivateBoostForZone(heating.ZoneId)
 }
